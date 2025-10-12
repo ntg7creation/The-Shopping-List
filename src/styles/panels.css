@@ -1,0 +1,28 @@
+/* panels.css – shared container look */
+.panel {
+  background: var(--panel);
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.controls { display: flex; gap: 8px; margin-bottom: 8px; }
+
+.button {
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.button:hover {
+  background: #111b2f;
+  border-color: #334155;
+}

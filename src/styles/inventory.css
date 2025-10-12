@@ -1,0 +1,51 @@
+:root {
+  --slot: 80px;
+  --wall: 8px;
+  --wall-color: #334155;
+  --slot-empty: #111827;
+  --slot-filled: #1e293b;
+}
+
+.panel.inventory-panel { min-height: 0; display: flex; flex-direction: column; }
+.inventory-wrap { flex: 1; min-height: 0; position: relative; }
+.inventory-grid-wrap {
+  position: absolute; inset: 0;
+  padding: var(--wall);
+  background: var(--wall-color);
+  border-radius: 8px;
+}
+.inventory-grid {
+  position: absolute; inset: var(--wall);
+  display: grid;
+  grid-auto-rows: var(--slot);
+  gap: var(--wall);
+  justify-content: start;
+  align-content: start;
+  user-select: none;
+  cursor: grab;
+}
+.slot {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+}
+.slot.empty { background: var(--slot-empty); opacity: 0.75; }
+.slot.filled {
+  background: var(--slot-filled);
+  cursor: grab;
+  transition: transform 80ms, filter 120ms;
+}
+.slot.filled:hover { transform: translateY(-1px); filter: brightness(1.06); }
+
+.item-icon { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--accent); }
+.item-name { font-size: 12px; text-align: center; }
+.amount-badge {
+  position: absolute; top: 4px; right: 6px;
+  padding: 2px 6px; font-size: 12px;
+  border-radius: 999px;
+  background: #0b1220; border: 1px solid #1f2937;
+  user-select: none;
+}

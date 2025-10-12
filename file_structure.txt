@@ -1,0 +1,33 @@
+.
+├── .gitignore
+├── README.md
+├── eslint.config.js
+├── file_structure.txt
+├── index.html
+├── list_structure.py
+├── package-lock.json
+├── package.json
+├── public/
+│   └── vite.svg
+├── src/
+│   ├── App.css
+│   ├── App.jsx
+│   ├── Basket/
+│   │   ├── Register.jsx
+│   │   └── ShoppingBasket.jsx
+│   ├── Cookbook/
+│   │   └── Cookbook.jsx
+│   ├── components/
+│   │   └── InfoBar.jsx
+│   ├── demoData.js
+│   ├── index.css
+│   ├── inventory/
+│   │   ├── InventoryGrid.jsx
+│   │   └── useInventory.js
+│   ├── main.jsx
+│   ├── recipes/
+│   │   └── README.md
+│   ├── styles.css
+│   └── utils/
+│       └── units.js
+└── vite.config.js

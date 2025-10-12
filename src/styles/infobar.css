@@ -1,0 +1,119 @@
+/* Animate InfoBar height + content fade */
+.info-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(180deg, #0b1220, #0a0f1a);
+  border-bottom: 1px solid #1f2937;
+  min-height: 130px;
+  overflow: hidden;
+  transition:
+    min-height 0.35s ease,
+    background 0.6s ease;
+}
+
+/* When showing more details (recipes) */
+.info-bar.two-rows {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  min-height: 150px;
+  background: linear-gradient(180deg, #0b1220 0%, #101b2f 100%);
+}
+
+/* Subtle fade-in for any newly rendered block */
+.info-section {
+  animation: fadeExpand 0.35s ease;
+}
+
+@keyframes fadeExpand {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+    background: linear-gradient(180deg, #112233aa, #0b1220);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    background: none;
+  }
+}
+
+.info-bar.switching {
+  background: linear-gradient(180deg, #103042, #0b1220);
+  transition: background 0.5s ease;
+}
+
+
+
+.info-title { font-weight: 700; }
+.ing-chips, .item-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.chip {
+  display: flex; gap: 6px; align-items: center;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid #334155; background: #0b1220;
+  font-size: 12px;
+}
+.chip-have { border-color: var(--ok); }
+.chip-need { border-color: var(--danger); }
+.pill {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid #334155; font-size: 13px;
+  background: #0b1220;
+}
+.pill-green { background: rgba(16,185,129,0.18); }
+.pill-amber { background: rgba(245,158,11,0.20); }
+.pill-red   { background: rgba(239,68,68,0.20); }
+
+
+/* InfoBar right-side action area */
+.info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.info-main {
+  flex: 1 1 auto;
+}
+
+.info-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.action-input {
+  background: #111827;
+  border: 1px solid #1f2937;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 4px 6px;
+  width: 70px;
+  font-size: 13px;
+}
+
+.action-btn {
+  background: var(--accent-2);
+  border: none;
+  color: #0b1220;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: filter 120ms;
+  white-space: nowrap;
+}
+.action-btn:hover {
+  filter: brightness(1.1);
+}
+
