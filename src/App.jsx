@@ -99,16 +99,7 @@ export default function App() {
     setSelectedRegisterItem(item);
   }
 
-  // -----------------------------
-  // Basket handlers
-  // -----------------------------
-  // function handleAddToBasket(item, setBasketItems) {
-  //   setBasketItems((prev) => [...prev, item]);
-  // }
 
-  // function handleDeleteFromBasket(id) {
-  //   setBasketItems((prev) => prev.filter((i) => i.id !== id));
-  // }
 
   // -----------------------------
   // Stage / Unstage (Basket ↔ Register)

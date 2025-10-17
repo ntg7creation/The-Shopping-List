@@ -14,9 +14,11 @@
 │   ├── App.jsx
 │   ├── Basket/
 │   │   ├── Register.jsx
-│   │   └── ShoppingBasket.jsx
+│   │   ├── ShoppingBasket.jsx
+│   │   └── helpers.js
 │   ├── Cookbook/
-│   │   └── Cookbook.jsx
+│   │   ├── Cookbook.jsx
+│   │   └── helpers.js
 │   ├── components/
 │   │   └── InfoBar.jsx
 │   ├── demoData.js
@@ -27,6 +29,13 @@
 │   ├── main.jsx
 │   ├── recipes/
 │   │   └── README.md
+│   ├── styles/
+│   │   ├── basket.css
+│   │   ├── cookbook.css
+│   │   ├── globals.css
+│   │   ├── infobar.css
+│   │   ├── inventory.css
+│   │   └── panels.css
 │   ├── styles.css
 │   └── utils/
 │       └── units.js
