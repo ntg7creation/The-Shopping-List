@@ -1,14 +1,14 @@
 // App.jsx
 import { useEffect, useState } from "react";
 import { handleAddToBasket, handleDeleteFromBasket } from "./Basket/helpers.js";
-import Register from "./Basket/Register.jsx";
-import ShoppingBasket from "./Basket/ShoppingBasket.jsx";
+import Register, { RegisterInfoBar } from "./Basket/Register.jsx";
+import ShoppingBasket, { BasketInfoBar } from "./Basket/ShoppingBasket.jsx";
 import InfoBar from "./components/InfoBar.jsx";
-import Cookbook from "./Cookbook/Cookbook.jsx";
+import Cookbook, { CookbookInfoBar } from "./Cookbook/Cookbook.jsx";
 import { handleAddRecipeToBasket } from "./Cookbook/helpers.js";
-
 import { recipes, shoppingBasket } from "./demoData.js";
-import InventoryGrid from "./inventory/InventoryGrid.jsx";
+import LoginButton from "./Google/LoginButton.jsx";
+import InventoryGrid, { InventoryInfoBar } from "./inventory/InventoryGrid.jsx";
 import { buildItemTypeTotals, useInventory } from "./inventory/useInventory.js";
 import "./styles/globals.css";
 import "./styles/panels.css";
@@ -22,6 +22,7 @@ export default function App() {
     entries,
     catalog,
     addEntry,
+    removeIngredients,
   } = useInventory();
 
   // -----------------------------
@@ -39,7 +40,6 @@ export default function App() {
     const saved = localStorage.getItem("shoppingBasket");
     return saved ? JSON.parse(saved) : [...shoppingBasket];
   });
-
   useEffect(() => {
     localStorage.setItem("shoppingBasket", JSON.stringify(basketItems));
   }, [basketItems]);
@@ -51,14 +51,9 @@ export default function App() {
     const saved = localStorage.getItem("registerItems");
     return saved ? JSON.parse(saved) : [];
   });
-
   useEffect(() => {
     localStorage.setItem("registerItems", JSON.stringify(registerItems));
   }, [registerItems]);
-
-
-
-
 
   // -----------------------------
   // Derived data
@@ -99,20 +94,31 @@ export default function App() {
     setSelectedRegisterItem(item);
   }
 
+  function handleCraftRecipe(recipe, count = 1) {
+    if (!recipe || !Array.isArray(recipe.ingredients)) return;
+
+    // Use the hook’s inventory mutator instead of manual subtraction
+    removeIngredients(recipe.ingredients, count, { partial: true });
+
+    console.log(`Crafted ${count}x ${recipe.title}`);
+  }
+
 
 
   // -----------------------------
   // Stage / Unstage (Basket ↔ Register)
   // -----------------------------
-  // Move from Basket → Register
-  function handleStageFromBasket(id) {
+  // Move from Basket → Register (optional new amount)
+  function handleStageFromBasket(id, nextAmount) {
     const item = basketItems.find((i) => i.id === id);
     if (!item) return;
 
-    // remove from basket
     const updatedBasket = basketItems.filter((i) => i.id !== id);
-    // add to register
-    const updatedRegister = [...registerItems, item];
+    const itemForRegister =
+      nextAmount != null && Number.isFinite(nextAmount)
+        ? { ...item, amount: nextAmount }
+        : item;
+    const updatedRegister = [...registerItems, itemForRegister];
 
     setBasketItems(updatedBasket);
     setRegisterItems(updatedRegister);
@@ -132,7 +138,6 @@ export default function App() {
     setSelectedSource("basket");
   }
 
-
   // -----------------------------
   // BUY (commit staged items → inventory)
   // -----------------------------
@@ -150,25 +155,70 @@ export default function App() {
 
     for (const it of registerItems) {
       const cat = (catalog || []).find((c) => c.itemType === it.itemType);
-      const expirationDays = cat?.defaultExpirationDays; // may be undefined → unknown
+      const expirationDays = cat?.defaultExpirationDays;
 
       addEntry({
         itemType: it.itemType,
         amount: it.amount,
         unit: it.unit,
         datePurchased: today,
-        expirationDays, // unknown remains undefined
+        expirationDays,
       });
     }
 
-    // clear register
     setRegisterItems([]);
     setSelectedRegisterItem(null);
     setSelectedSource("inventory");
   }
 
+  // -----------------------------
+  // Choose InfoBar plugin
+  // -----------------------------
+  const renderInfoBar = () => {
+    if (selectedSource === "recipe" && selectedRecipe) {
+      return (
+        <CookbookInfoBar
+          recipe={selectedRecipe}
+          typePresentMap={typeTotals}
+          onAddRecipeToBasket={(r) => handleAddRecipeToBasket(r, setBasketItems)}
+          onCraftRecipe={handleCraftRecipe}
+          onAddIngredientToBasket={(item) => handleAddToBasket(item, setBasketItems)}
+        />
+      );
+    }
 
 
+    if (selectedSource === "inventory" && selectedGroup) {
+      const cat = (catalog || []).find((c) => c.itemType === selectedGroup.itemType);
+      return (
+        <InventoryInfoBar
+          group={selectedGroup}
+          unit={cat?.unit}
+          onAddToBasket={(item) => handleAddToBasket(item, setBasketItems)}
+        />
+      );
+    }
+
+    if (selectedSource === "basket" && selectedBasketItem) {
+      return (
+        <BasketInfoBar
+          item={selectedBasketItem}
+          onMoveToRegister={(id, amt) => handleStageFromBasket(id, amt)}
+        />
+      );
+    }
+
+    if (selectedSource === "register" && selectedRegisterItem) {
+      return (
+        <RegisterInfoBar
+          item={selectedRegisterItem}
+          onReturnToBasket={(id) => handleUnstageToBasket(id)}
+        />
+      );
+    }
+
+    return null;
+  };
 
   // -----------------------------
   // Render
@@ -176,28 +226,7 @@ export default function App() {
   return (
     <div className="app">
       {/* Top info bar */}
-      <InfoBar
-        selectedItem={
-          selectedSource === "basket"
-            ? { ...selectedBasketItem, source: "basket" }
-            : selectedSource === "register"
-              ? { ...selectedRegisterItem, source: "register" }
-              : selectedSource === "inventory"
-                ? { ...selectedGroup, source: "inventory" }
-                : null
-        }
-        selectedRecipe={selectedSource === "recipe" ? selectedRecipe : null}
-        typePresentMap={typeTotals}
-        onAction={(type, payload) => {
-          if (type === "moveToRegister") handleStageFromBasket(payload.id, payload.amount);
-          else if (type === "returnToBasket") handleUnstageToBasket(payload.id);
-          else if (type === "addToBasket") handleAddToBasket(payload, setBasketItems);
-          else if (type === "addRecipeToBasket") handleAddRecipeToBasket(payload, setBasketItems);
-
-        }}
-      />
-
-
+      <InfoBar>{renderInfoBar()}</InfoBar>
 
       {/* 3-column content */}
       <div className="content">

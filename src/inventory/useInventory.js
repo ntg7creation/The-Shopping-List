@@ -74,6 +74,94 @@ export function useInventory() {
     });
   }
 
+  /**
+   * Remove ingredients from inventory.
+   * - ingredients: [{ itemType, amount, unit }]
+   * - count: craft multiplier
+   * - options.partial: if true, removes what's available even if not enough (e.g., need 3 eggs, have 2 → remove 2).
+   *   If false, requires full amount per itemType or removes nothing for that type.
+   */
+  function removeIngredients(
+    ingredients = [],
+    count = 1,
+    { partial = true } = {}
+  ) {
+    if (!Array.isArray(ingredients) || ingredients.length === 0) return;
+
+    // Build how much we need per itemType
+    const needMap = new Map();
+    for (const ing of ingredients) {
+      const type = ing?.itemType;
+      if (!type) continue;
+      const need = (Number(ing?.amount) || 0) * (Number(count) || 1);
+      if (!need) continue;
+      needMap.set(type, (needMap.get(type) || 0) + need);
+    }
+
+    setEntries((prev) => {
+      if (!prev || prev.length === 0) return prev;
+
+      // Calculate availability per type
+      const haveMap = new Map();
+      for (const e of prev) {
+        const t = e?.itemType;
+        if (!t) continue;
+        haveMap.set(t, (haveMap.get(t) || 0) + (Number(e?.amount) || 0));
+      }
+
+      // If partial=false, skip any type that doesn't fully meet need
+      if (!partial) {
+        for (const [type, need] of needMap.entries()) {
+          const have = haveMap.get(type) || 0;
+          if (have < need) {
+            needMap.delete(type); // do not remove any amount of this type
+          }
+        }
+      }
+
+      if (needMap.size === 0) return prev;
+
+      // Now walk entries and subtract
+      const next = [];
+      // Copy so we can mutate remaining need per type
+      const remaining = new Map(needMap);
+
+      for (const e of prev) {
+        const t = e?.itemType;
+        if (!t || !remaining.has(t)) {
+          next.push(e);
+          continue;
+        }
+
+        let rem = remaining.get(t);
+        if (rem <= 0) {
+          next.push(e);
+          continue;
+        }
+
+        const have = Number(e?.amount) || 0;
+        if (have <= 0) {
+          next.push(e);
+          continue;
+        }
+
+        if (have > rem) {
+          // We have more in this entry than we need → subtract and keep entry
+          const newAmt = have - rem;
+          remaining.set(t, 0);
+          next.push({ ...e, amount: newAmt });
+        } else {
+          // We have less or equal → consume this entry completely
+          remaining.set(t, rem - have);
+          // If exact match (rem === have), entry is removed (not pushed)
+          // If have < rem, also removed entirely (partial consumption)
+        }
+      }
+
+      return next;
+    });
+  }
+
   return {
     catalog,
     entries,
@@ -83,6 +171,7 @@ export function useInventory() {
     sortByName,
     swapEntries,
     addEntry,
+    removeIngredients,
   };
 }
 
@@ -139,4 +228,22 @@ export function scoreRecipePresence(recipe, itemTypeMap) {
 
   const ratio = have / total;
   return { score: ratio, haveCount: have, missingCount: total - have };
+}
+
+// --- Compute how many times a recipe can be fully crafted based on inventory ---
+export function computeCraftableCount(recipe, itemTypeMap) {
+  const reqs = recipe?.ingredients ?? [];
+  if (!reqs.length) return 0;
+
+  let minCrafts = Infinity;
+  for (const r of reqs) {
+    const type = r?.itemType;
+    if (!type) continue;
+    const need = Number(r?.amount ?? 1);
+    const haveAmt = getAmountForItemType(itemTypeMap, type);
+    if (haveAmt <= 0) return 0;
+    const possible = Math.floor(haveAmt / need);
+    if (possible < minCrafts) minCrafts = possible;
+  }
+  return isFinite(minCrafts) ? minCrafts : 0;
 }

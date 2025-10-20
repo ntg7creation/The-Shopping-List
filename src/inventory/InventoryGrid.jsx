@@ -157,3 +157,51 @@ export default function InventoryGrid({ groups, onSelect, onSwap }) {
         </div>
     );
 }
+
+
+export function InventoryInfoBar({ group, unit, onAddToBasket }) {
+    const [amt, setAmt] = useState("");
+    if (!group) return null;
+
+    const displayName = group.displayName ?? group.itemType;
+    const amountVal = amt.trim() === "" ? 1 : Number(amt);
+
+    return (
+        <>
+            <div className="info-main">
+                <div className="info-section">
+                    <div className="info-title">ℹ️ {displayName}</div>
+                    <div className="item-chips">
+                        <span className="pill pill-outline">Type {group.itemType}</span>
+                        {group.group && <span className="pill pill-outline">Group {group.group}</span>}
+                        <span className="pill pill-outline">In stock {group.totalAmount}</span>
+                        {unit && <span className="pill pill-outline">Unit {unit}</span>}
+                    </div>
+                </div>
+            </div>
+
+            <div className="info-action">
+                <input
+                    type="number"
+                    className="action-input"
+                    placeholder="1"
+                    value={amt}
+                    onChange={(e) => setAmt(e.target.value)}
+                />
+                <button
+                    className="action-btn"
+                    onClick={() =>
+                        onAddToBasket?.({
+                            id: `buy-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                            itemType: group.itemType,
+                            amount: amountVal,
+                            unit,
+                        })
+                    }
+                >
+                    🛒 Add to Basket
+                </button>
+            </div>
+        </>
+    );
+}

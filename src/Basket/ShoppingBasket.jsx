@@ -111,3 +111,43 @@ export default function ShoppingBasket({
         </div>
     );
 }
+
+
+// ShoppingBasket.jsx (append below the default export)
+export function BasketInfoBar({ item, onMoveToRegister }) {
+    const [amt, setAmt] = useState("");
+    if (!item) return null;
+
+    const amountVal = amt.trim() === "" ? (item.amount ?? 1) : Number(amt);
+
+    return (
+        <>
+            <div className="info-main">
+                <div className="info-section">
+                    <div className="info-title">🛒 {item.itemType}</div>
+                    <div className="item-chips">
+                        <span className="pill pill-outline">
+                            Amount {item.amount ?? "—"} {item.unit ?? ""}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="info-action">
+                <input
+                    type="number"
+                    className="action-input"
+                    placeholder={String(item.amount ?? 1)}
+                    value={amt}
+                    onChange={(e) => setAmt(e.target.value)}
+                />
+                <button
+                    className="action-btn"
+                    onClick={() => onMoveToRegister?.(item.id, amountVal)}
+                >
+                    ➜ Add to Register
+                </button>
+            </div>
+        </>
+    );
+}

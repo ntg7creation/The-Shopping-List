@@ -52,3 +52,17 @@
 .avail-yellow { border-color: rgba(245,158,11,0.35); background: linear-gradient(90deg, rgba(245,158,11,0.10), transparent); box-shadow: inset 4px 0 0 0 var(--warn); }
 .avail-orange { border-color: rgba(245,158,11,0.55); background: linear-gradient(90deg, rgba(245,158,11,0.16), transparent); box-shadow: inset 4px 0 0 0 var(--warn); }
 .avail-red    { border-color: rgba(239,68,68,0.35); background: linear-gradient(90deg, rgba(239,68,68,0.10), transparent); box-shadow: inset 4px 0 0 0 var(--danger); }
+
+.recipe-sub strong {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.chip {
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.chip:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}

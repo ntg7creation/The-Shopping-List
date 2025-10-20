@@ -91,3 +91,32 @@ export default function Register({
         </div>
     );
 }
+
+
+export function RegisterInfoBar({ item, onReturnToBasket }) {
+    if (!item) return null;
+
+    return (
+        <>
+            <div className="info-main">
+                <div className="info-section">
+                    <div className="info-title">🧾 {item.itemType}</div>
+                    <div className="item-chips">
+                        <span className="pill pill-outline">
+                            Amount {item.amount ?? "—"} {item.unit ?? ""}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="info-action">
+                <button
+                    className="action-btn"
+                    onClick={() => onReturnToBasket?.(item.id)}
+                >
+                    ⟲ Return to Basket
+                </button>
+            </div>
+        </>
+    );
+}
